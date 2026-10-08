@@ -27,6 +27,7 @@ jobs:
       - name: Claude probe
         uses: anthropics/claude-code-action@9ddce40de8c1ab71fb6303a125fdad0968dc1312
         with:
+          model: claude-haiku-4-5-20251001
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
           claude_args: --max-turns 20
