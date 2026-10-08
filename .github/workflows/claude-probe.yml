@@ -1,0 +1,32 @@
+# Probe: can a PR-supplied .claude/settings.json widen the tool allowlist that
+# claude-code-action sets via --allowedTools?  Baseline allowlist has NO general Bash.
+name: claude settings-merge probe
+on:
+  issue_comment:
+    types: [created]
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+jobs:
+  probe:
+    if: >
+      github.event.issue.pull_request &&
+      contains(github.event.comment.body, '@claude')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR head
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
+        with:
+          ref: refs/pull/${{ github.event.issue.number }}/head
+          fetch-depth: 0
+      - name: Show any PR-supplied agent settings
+        run: |
+          echo "--- .claude/settings.json in this PR tree:"
+          cat .claude/settings.json 2>/dev/null || echo "(none)"
+      - name: Claude probe
+        uses: anthropics/claude-code-action@9ddce40de8c1ab71fb6303a125fdad0968dc1312
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          claude_args: --max-turns 4
